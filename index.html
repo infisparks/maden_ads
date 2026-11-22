@@ -1051,16 +1051,16 @@
           <label class="form-label" for="userPhone">Phone Number (WhatsApp) <span>*</span></label>
           <input type="tel" id="userPhone" class="form-input" placeholder="e.g. +91 98765 43210" required autocomplete="tel">
         </div>
+        <!-- Site Visit Date (Quick 7 Upcoming Days) -->
         <div class="form-group">
-          <label class="form-label" for="apartmentType">Apartment Configuration</label>
-          <select id="apartmentType" class="form-select">
-            <option value="1BHK">1 BHK Premium</option>
-            <option value="2BHK" selected>2 BHK Luxury</option>
-            <option value="both">Both 1 BHK & 2 BHK</option>
-          </select>
+          <label class="form-label">Select Site Visit Date <span>*</span></label>
+          <div class="date-chips-grid" id="dateChipsContainer">
+            <!-- Dynamically populated with 7 upcoming days -->
+          </div>
+          <input type="hidden" id="siteVisitDate" required>
         </div>
         <button type="submit" class="form-submit-btn">
-          <span>Get Instant Payment Plan</span>
+          <span>Schedule Visit & Get Plan</span>
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
             <path d="M5 12h14"></path>
             <path d="M12 5l7 7-7 7"></path>
@@ -1087,6 +1087,55 @@
     const paymentForm = document.getElementById('paymentPlanForm');
     const toast = document.getElementById('toastMsg');
     const toastText = document.getElementById('toastText');
+    const dateChipsContainer = document.getElementById('dateChipsContainer');
+    const siteVisitDateInput = document.getElementById('siteVisitDate');
+
+    // -------------------------------------------------------------
+    // Generate Upcoming 7 Days for Quick 1-Tap Site Visit Selection
+    // -------------------------------------------------------------
+    const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+    function setupDateChips() {
+      dateChipsContainer.innerHTML = '';
+      const baseDate = new Date(); // Today: 22 Nov
+
+      for (let i = 0; i < 7; i++) {
+        const d = new Date(baseDate);
+        d.setDate(baseDate.getDate() + i);
+
+        const dayName = dayNames[d.getDay()];
+        const dayNum = d.getDate();
+        const monthName = monthNames[d.getMonth()];
+        const dateValue = `${dayNum} ${monthName} (${dayName})`;
+
+        let labelText = `${dayName}, ${dayNum} ${monthName}`;
+        if (i === 0) labelText = `Today (${dayNum} ${monthName})`;
+        else if (i === 1) labelText = `Tomorrow (${dayNum} ${monthName})`;
+
+        const chip = document.createElement('div');
+        chip.className = `date-chip ${i === 0 ? 'active' : ''}`;
+        chip.setAttribute('role', 'button');
+        chip.setAttribute('tabindex', '0');
+        chip.innerHTML = `
+          <span class="chip-label">${i === 0 ? 'Today' : (i === 1 ? 'Tomorrow' : dayName)}</span>
+          <span class="chip-date">${dayNum} ${monthName}</span>
+        `;
+
+        chip.addEventListener('click', () => {
+          document.querySelectorAll('.date-chip').forEach(c => c.classList.remove('active'));
+          chip.classList.add('active');
+          siteVisitDateInput.value = labelText;
+        });
+
+        dateChipsContainer.appendChild(chip);
+
+        if (i === 0) {
+          siteVisitDateInput.value = labelText;
+        }
+      }
+    }
+    setupDateChips();
 
     function showToast(message) {
       toastText.textContent = message;
@@ -1136,7 +1185,6 @@
     });
 
     // Cloudflare Worker & Firebase Configuration
-    // Once you deploy the worker (see worker/README.md), replace CLOUDFLARE_WORKER_URL with your live worker URL.
     const CLOUDFLARE_WORKER_URL = "https://maden-nova-leads.workers.dev";
     const FIREBASE_REST_URL = "https://sample-firebase-ai-app-ba30f-default-rtdb.firebaseio.com/leads.json?auth=iYUsh2KFKYgJuhESJaw1gbV1IBentiFn1Kdy8x6I";
 
@@ -1146,7 +1194,7 @@
       e.preventDefault();
       const name = document.getElementById('userName').value.trim();
       const phone = document.getElementById('userPhone').value.trim();
-      const config = document.getElementById('apartmentType').value;
+      const siteVisitDate = siteVisitDateInput.value || "Today (22 Nov)";
 
       if (!name || !phone) return;
 
@@ -1155,23 +1203,24 @@
       submitBtn.disabled = true;
       submitBtn.innerHTML = `
         <span class="btn-spinner"></span>
-        <span>Saving Details...</span>
+        <span>Scheduling Visit...</span>
       `;
 
       const leadData = {
         name: name,
         phone: phone,
-        apartmentType: config,
+        siteVisitDate: siteVisitDate,
         project: "Maden Nova 1",
         location: "Sector 5, Taloja Phase 1, Navi Mumbai",
-        source: "Landing Page - Payment Plan Form",
-        timestamp: new Date().toISOString()
+        source: "Landing Page - Payment Plan & Site Visit",
+        timestamp: new Date().toISOString(),
+        notes: []
       };
 
       try {
         let saved = false;
 
-        // 1. First attempt: Send to Cloudflare Worker (if deployed)
+        // 1. Send to Cloudflare Worker (if deployed)
         try {
           const workerRes = await fetch(CLOUDFLARE_WORKER_URL, {
             method: "POST",
@@ -1183,10 +1232,10 @@
             console.log("Lead stored via Cloudflare Worker!");
           }
         } catch (workerErr) {
-          console.warn("Cloudflare Worker not reachable yet, falling back directly to Firebase RTDB:", workerErr);
+          console.warn("Worker not reachable, falling back to Firebase RTDB:", workerErr);
         }
 
-        // 2. Fallback / Direct: If worker is not yet deployed, save directly into Firebase RTDB
+        // 2. Direct Fallback to Firebase RTDB
         if (!saved) {
           const fbRes = await fetch(FIREBASE_REST_URL, {
             method: "POST",
@@ -1200,12 +1249,13 @@
         }
 
         closeModal();
-        showToast(`Thank you ${name}! Details saved successfully.`);
+        showToast(`Thank you ${name}! Visit scheduled for ${siteVisitDate}.`);
         paymentForm.reset();
+        setupDateChips();
 
-        // Redirect / Open WhatsApp with prefilled inquiry message
+        // Redirect / Open WhatsApp with prefilled message
         setTimeout(() => {
-          const text = encodeURIComponent(`Hello! My name is ${name}. I am requesting the Payment Plan for ${config} at Maden Nova 1, Sector 5, Taloja Phase 1.`);
+          const text = encodeURIComponent(`Hello! My name is ${name}. I have requested the Payment Plan and would like to visit Maden Nova 1 on ${siteVisitDate}.`);
           window.open(`https://wa.me/918108821353?text=${text}`, '_blank');
         }, 800);
 
