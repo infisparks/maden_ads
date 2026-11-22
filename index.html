@@ -474,7 +474,7 @@
     }
 
     /* ==========================================================
-       UNIFIED SEGMENTED ACTION BAR
+       UNIFIED ACTION BAR
        ========================================================= */
     .cta-segmented-bar {
       display: flex;
@@ -512,10 +512,25 @@
       filter: brightness(0.95);
     }
 
+    /* Primary full-width button initially */
     .btn-seg-payment {
       background: linear-gradient(90deg, #052654 0%, #0d4685 100%);
+      flex: 1;
+      width: 100%;
+      padding: 14px 20px;
+      font-size: clamp(14px, 3.8vw, 16px);
+    }
+
+    /* When WhatsApp CTA is shown after form submission */
+    .cta-segmented-bar.has-whatsapp .btn-seg-payment {
       flex: 1.4;
       padding: 12px 14px;
+      font-size: clamp(11.5px, 3.2vw, 14px);
+    }
+
+    .cta-segmented-bar:not(.has-whatsapp) .btn-seg-divider,
+    .cta-segmented-bar:not(.has-whatsapp) .btn-seg-whatsapp {
+      display: none !important;
     }
 
     .btn-doc-icon {
@@ -728,6 +743,82 @@
       display: flex;
       flex-direction: column;
       gap: 15px;
+    }
+
+    /* Modal Post-Submission State */
+    .modal-success-state {
+      padding: 28px 20px 24px 20px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .success-icon-badge {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: #ecfdf5;
+      color: #16a34a;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 14px;
+      border: 2px solid #bbf7d0;
+    }
+
+    .success-icon-badge svg {
+      width: 28px;
+      height: 28px;
+    }
+
+    .success-title {
+      font-size: 19px;
+      font-weight: 800;
+      color: var(--color-navy-dark);
+      margin-bottom: 6px;
+    }
+
+    .success-desc {
+      font-size: 13.5px;
+      color: #4b5563;
+      line-height: 1.5;
+      margin-bottom: 20px;
+      max-width: 340px;
+    }
+
+    .btn-modal-whatsapp {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      width: 100%;
+      padding: 14px 20px;
+      background: linear-gradient(180deg, #25D366 0%, #1ea952 100%);
+      color: #ffffff;
+      font-size: 15px;
+      font-weight: 700;
+      text-decoration: none;
+      border-radius: 12px;
+      box-shadow: 0 4px 16px rgba(37, 211, 102, 0.38);
+      transition: all 0.2s ease;
+      margin-bottom: 12px;
+    }
+
+    .btn-modal-whatsapp:hover {
+      filter: brightness(1.08);
+      transform: translateY(-1px);
+    }
+
+    .btn-modal-dismiss {
+      background: transparent;
+      border: none;
+      color: #6b7280;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      padding: 6px 12px;
+      text-decoration: underline;
     }
 
     .form-group {
@@ -1027,8 +1118,8 @@
         <span class="site-address-text">Plot No. 100, Sector 5, Taloja Phase 1, Navi Mumbai</span>
       </div>
 
-      <!-- Unified Segmented Action Bar (Payment Plan & WhatsApp) -->
-      <div class="cta-segmented-bar" role="group" aria-label="Action Buttons">
+      <!-- Unified Segmented Action Bar (Payment Plan & Post-Submit WhatsApp) -->
+      <div class="cta-segmented-bar" id="mainCtaBar" role="group" aria-label="Action Buttons">
         <!-- Left: Get Payment Plan Button -->
         <button class="btn-seg btn-seg-payment" id="openPaymentModalBtn" type="button">
           <!-- Folded Document Icon -->
@@ -1039,10 +1130,10 @@
           <span class="btn-arrow" aria-hidden="true">→</span>
         </button>
 
-        <!-- Divider Line -->
-        <div class="btn-seg-divider" aria-hidden="true"></div>
+        <!-- Divider Line (Hidden until form submitted) -->
+        <div class="btn-seg-divider" id="ctaDivider" aria-hidden="true"></div>
 
-        <!-- Right: Discuss on WhatsApp Button -->
+        <!-- Right: Discuss on WhatsApp Button (Hidden until form submitted) -->
         <a 
           href="https://wa.me/918108821353?text=Hi%2C%20I%20am%20interested%20in%20Maden%20Nova%201%20at%20Sector%205%2C%20Taloja%20Phase%201.%20Please%20share%20the%20details%20and%20pricing." 
           target="_blank" 
@@ -1115,6 +1206,36 @@
           </svg>
         </button>
       </form>
+
+      <!-- Post-Submission Success State with Discuss on WhatsApp -->
+      <div class="modal-success-state" id="modalSuccessState" style="display: none;">
+        <div class="success-icon-badge">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+        </div>
+        <h4 class="success-title">Request Submitted Successfully!</h4>
+        <p class="success-desc">
+          Thank you, <strong id="successUserName">Valued Client</strong>! Your site visit is set for <strong id="successVisitDate">Upcoming</strong>. Click below to connect with us directly on WhatsApp:
+        </p>
+
+        <!-- Discuss on WhatsApp CTA Button -->
+        <a 
+          href="#" 
+          id="modalWhatsappBtn" 
+          target="_blank" 
+          rel="noopener noreferrer" 
+          class="btn-modal-whatsapp"
+        >
+          <svg class="whatsapp-bubble-icon" viewBox="0 0 32 32" fill="none" style="width: 20px; height: 20px;">
+            <circle cx="16" cy="16" r="14" stroke="#ffffff" stroke-width="2.5" fill="none"/>
+            <path d="M20.5 19.3c-.3.8-1.5 1.5-2.1 1.6-.6.1-1.3.1-4.2-1.1-3.5-1.4-5.7-5-5.9-5.2-.2-.2-1.4-1.9-1.4-3.6s.9-2.5 1.2-2.9c.3-.3.7-.4 1-.4h.7c.2 0 .5-.1.8.6.3.7 1 2.5 1.1 2.7.1.2.1.4 0 .6-.1.2-.2.4-.4.6s-.4.5-.5.6c-.2.2-.4.4-.2.7.2.4.9 1.5 2 2.5 1.4 1.2 2.6 1.6 2.9 1.8.4.2.6.2.8-.1.2-.2.9-1.1 1.2-1.4.2-.4.5-.3.8-.2.3.1 2.1 1 2.5 1.2.4.2.6.3.7.5.1.1.1.9-.2 1.6z" fill="#ffffff"/>
+          </svg>
+          <span>Discuss on WhatsApp →</span>
+        </a>
+
+        <button type="button" class="btn-modal-dismiss" id="dismissModalBtn">Close Window</button>
+      </div>
     </div>
   </div>
 
@@ -1133,6 +1254,14 @@
     const closeModalBtn = document.getElementById('closePaymentModalBtn');
     const paymentModal = document.getElementById('paymentModal');
     const paymentForm = document.getElementById('paymentPlanForm');
+    const modalSuccessState = document.getElementById('modalSuccessState');
+    const modalWhatsappBtn = document.getElementById('modalWhatsappBtn');
+    const dismissModalBtn = document.getElementById('dismissModalBtn');
+    const successUserName = document.getElementById('successUserName');
+    const successVisitDate = document.getElementById('successVisitDate');
+    const mainCtaBar = document.getElementById('mainCtaBar');
+    const shareWhatsAppBtn = document.getElementById('shareWhatsAppBtn');
+
     const toast = document.getElementById('toastMsg');
     const toastText = document.getElementById('toastText');
     const dateChipsContainer = document.getElementById('dateChipsContainer');
@@ -1208,6 +1337,9 @@
     });
 
     function openModal() {
+      // Show form and hide success state when opening
+      paymentForm.style.display = 'flex';
+      modalSuccessState.style.display = 'none';
       paymentModal.classList.add('active');
       document.body.style.overflow = 'hidden';
       document.getElementById('userName').focus();
@@ -1220,6 +1352,7 @@
 
     openModalBtn.addEventListener('click', openModal);
     closeModalBtn.addEventListener('click', closeModal);
+    if (dismissModalBtn) dismissModalBtn.addEventListener('click', closeModal);
 
     paymentModal.addEventListener('click', (e) => {
       if (e.target === paymentModal) {
@@ -1297,16 +1430,34 @@
           }
         }
 
-        closeModal();
+        // Prepare personalized WhatsApp URL
+        const waText = encodeURIComponent(`Hello! My name is ${name}. I submitted the form on your website for Maden Nova 1 and would like to visit on ${siteVisitDate}. Please share the payment plan.`);
+        const waUrl = `https://wa.me/918108821353?text=${waText}`;
+
+        // 1. Switch Modal to Success State with prominent Discuss on WhatsApp CTA
+        paymentForm.style.display = 'none';
+        modalSuccessState.style.display = 'flex';
+        successUserName.textContent = name;
+        successVisitDate.textContent = siteVisitDate;
+        modalWhatsappBtn.href = waUrl;
+
+        // 2. Also reveal Discuss on WhatsApp CTA button on the main page action bar
+        if (mainCtaBar) mainCtaBar.classList.add('has-whatsapp');
+        if (shareWhatsAppBtn) shareWhatsAppBtn.href = waUrl;
+
         showToast(`Thank you ${name}! Visit scheduled for ${siteVisitDate}.`);
         paymentForm.reset();
         setupDateChips();
 
-        // Redirect / Open WhatsApp with prefilled message
-        setTimeout(() => {
-          const text = encodeURIComponent(`Hello! My name is ${name}. I have requested the Payment Plan and would like to visit Maden Nova 1 on ${siteVisitDate}.`);
-          window.open(`https://wa.me/918108821353?text=${text}`, '_blank');
-        }, 800);
+      } catch (err) {
+        console.error("Submission error:", err);
+        closeModal();
+        showToast(`Thank you ${name}! Your request has been recorded.`);
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalBtnHTML;
+      }
+    });
 
       } catch (err) {
         console.error("Submission error:", err);
