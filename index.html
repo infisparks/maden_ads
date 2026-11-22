@@ -646,14 +646,12 @@
       line-height: 1.4;
     }
 
-    /* Date Chips Grid (Quick 7-Day Selection) */
+    /* Date Chips Grid (Quick 6-Day Selection: 3 Columns x 2 Rows) */
     .date-chips-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
-      gap: 6px;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
       margin-top: 4px;
-      max-height: 155px;
-      overflow-y: auto;
       padding: 2px;
     }
 
@@ -1101,11 +1099,11 @@
           <label class="form-label" for="userPhone">Phone Number (WhatsApp) <span>*</span></label>
           <input type="tel" id="userPhone" class="form-input" placeholder="e.g. +91 98765 43210" required autocomplete="tel">
         </div>
-        <!-- Site Visit Date (Quick 8 Upcoming Days) -->
+        <!-- Site Visit Date (Quick 6 Upcoming Days: 3 per row) -->
         <div class="form-group">
           <label class="form-label">Select Site Visit Date <span>*</span></label>
           <div class="date-chips-grid" id="dateChipsContainer">
-            <!-- Dynamically populated with 8 upcoming days (4 per row x 2 rows) -->
+            <!-- Dynamically populated with 6 upcoming days (3 per row x 2 rows) -->
           </div>
           <input type="hidden" id="siteVisitDate" required>
         </div>
@@ -1141,7 +1139,7 @@
     const siteVisitDateInput = document.getElementById('siteVisitDate');
 
     // -------------------------------------------------------------
-    // Generate Upcoming 8 Days for Quick 1-Tap Site Visit Selection (4x2 Grid)
+    // Generate Upcoming 6 Days for Quick 1-Tap Site Visit Selection (3x2 Grid)
     // -------------------------------------------------------------
     const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
     const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -1150,7 +1148,7 @@
       dateChipsContainer.innerHTML = '';
       const baseDate = new Date(); // Today: 22 Nov
 
-      for (let i = 0; i < 8; i++) {
+      for (let i = 0; i < 6; i++) {
         const d = new Date(baseDate);
         d.setDate(baseDate.getDate() + i);
 
