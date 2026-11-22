@@ -1,0 +1,7 @@
+name = "maden-nova-leads"
+main = "index.js"
+compatibility_date = "2024-01-01"
+
+[vars]
+FIREBASE_DB_URL = "https://sample-firebase-ai-app-ba30f-default-rtdb.firebaseio.com"
+FIREBASE_SECRET = "iYUsh2KFKYgJuhESJaw1gbV1IBentiFn1Kdy8x6I"
