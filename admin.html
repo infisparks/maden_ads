@@ -1,0 +1,1395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Maden Nova 1 — Admin CRM Dashboard</title>
+  
+  <!-- Inter & Plus Jakarta Sans Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    /* ==========================================================
+       GLOBAL DESIGN SYSTEM (Strict HR / CRM Dashboard Guidelines)
+       ========================================================= */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    :root {
+      --primary: #4f46e5;
+      --primary-hover: #4338ca;
+      --primary-light: #eef2ff;
+      --bg-page: #f5f6f8;
+      --bg-card: #ffffff;
+      --border-color: #e5e7eb;
+      --text-main: #111827;
+      --text-muted: #6b7280;
+      --text-light: #9ca3af;
+      --success: #10b981;
+      --success-light: #ecfdf5;
+      --warning: #f59e0b;
+      --warning-light: #fffbeb;
+      --danger: #ef4444;
+      --danger-light: #fef2f2;
+      
+      --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --radius-lg: 16px;
+      --shadow-subtle: 0 1px 3px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.03);
+      --shadow-card: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+    }
+
+    body {
+      font-family: var(--font-sans);
+      background-color: var(--bg-page);
+      color: var(--text-main);
+      min-height: 100vh;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ==========================================================
+       LOGIN OVERLAY SCREEN (Passkey Gate)
+       ========================================================= */
+    .login-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: var(--bg-page);
+      z-index: 10000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+
+    .login-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+      width: 100%;
+      max-width: 400px;
+      padding: 32px 28px;
+      text-align: center;
+    }
+
+    .login-icon-box {
+      width: 52px;
+      height: 52px;
+      background: var(--primary-light);
+      color: var(--primary);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 16px auto;
+    }
+
+    .login-card h2 {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-bottom: 6px;
+    }
+
+    .login-card p {
+      font-size: 13.5px;
+      color: var(--text-muted);
+      margin-bottom: 22px;
+    }
+
+    .input-field {
+      width: 100%;
+      padding: 11px 14px;
+      border: 1.5px solid var(--border-color);
+      border-radius: var(--radius-md);
+      font-size: 14px;
+      font-family: inherit;
+      color: var(--text-main);
+      outline: none;
+      transition: all 0.2s ease;
+      background: #fafafa;
+    }
+
+    .input-field:focus {
+      border-color: var(--primary);
+      background: #ffffff;
+      box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: #ffffff;
+      border: none;
+      padding: 11px 20px;
+      border-radius: var(--radius-md);
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      width: 100%;
+      margin-top: 14px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: background 0.2s ease;
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-hover);
+    }
+
+    .login-error {
+      color: var(--danger);
+      font-size: 12.5px;
+      margin-top: 10px;
+      display: none;
+      font-weight: 600;
+    }
+
+    /* ==========================================================
+       DASHBOARD WRAPPER & NAV
+       ========================================================= */
+    .dashboard-layout {
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    .top-navbar {
+      background: #ffffff;
+      border-bottom: 1px solid var(--border-color);
+      padding: 14px 20px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    @media (min-width: 768px) {
+      .top-navbar {
+        padding: 16px 32px;
+      }
+    }
+
+    .brand-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-logo-badge {
+      background: var(--primary);
+      color: #ffffff;
+      font-weight: 800;
+      font-size: 14px;
+      padding: 6px 10px;
+      border-radius: var(--radius-sm);
+      letter-spacing: 0.5px;
+    }
+
+    .brand-titles h1 {
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--text-main);
+      line-height: 1.2;
+    }
+
+    .brand-titles span {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .btn-outline {
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      padding: 8px 14px;
+      border-radius: var(--radius-md);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+      text-decoration: none;
+    }
+
+    .btn-outline:hover {
+      background: #f9fafb;
+      border-color: #d1d5db;
+    }
+
+    /* ==========================================================
+       MAIN CONTENT CONTAINER
+       ========================================================= */
+    .main-container {
+      width: 100%;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px 16px 40px 16px;
+    }
+
+    @media (min-width: 768px) {
+      .main-container {
+        padding: 28px 24px 60px 24px;
+      }
+    }
+
+    /* ==========================================================
+       METRICS OVERVIEW CARDS
+       ========================================================= */
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 14px;
+      margin-bottom: 24px;
+    }
+
+    .metric-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 18px 20px;
+      box-shadow: var(--shadow-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .metric-info h4 {
+      font-size: 12px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      margin-bottom: 4px;
+    }
+
+    .metric-info .metric-num {
+      font-size: 26px;
+      font-weight: 800;
+      color: var(--text-main);
+      line-height: 1;
+    }
+
+    .metric-badge-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .icon-indigo { background: var(--primary-light); color: var(--primary); }
+    .icon-green { background: var(--success-light); color: var(--success); }
+    .icon-amber { background: var(--warning-light); color: var(--warning); }
+
+    /* ==========================================================
+       FILTER CONTROLS & SEARCH BAR
+       ========================================================= */
+    .controls-panel {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 14px 16px;
+      margin-bottom: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    @media (min-width: 768px) {
+      .controls-panel {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+      }
+    }
+
+    .filter-pills {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+      scrollbar-width: none;
+    }
+
+    .filter-pills::-webkit-scrollbar {
+      display: none;
+    }
+
+    .filter-btn {
+      background: #f3f4f6;
+      border: 1px solid var(--border-color);
+      color: var(--text-muted);
+      padding: 7px 14px;
+      border-radius: 9999px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.15s ease;
+    }
+
+    .filter-btn:hover {
+      background: #e5e7eb;
+      color: var(--text-main);
+    }
+
+    .filter-btn.active {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: #ffffff;
+    }
+
+    .search-box-wrapper {
+      position: relative;
+      width: 100%;
+      max-width: 280px;
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 8px 12px 8px 34px;
+      border: 1.5px solid var(--border-color);
+      border-radius: var(--radius-md);
+      font-size: 13px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .search-input:focus {
+      border-color: var(--primary);
+    }
+
+    .search-icon {
+      position: absolute;
+      top: 50%;
+      left: 10px;
+      transform: translateY(-50%);
+      color: var(--text-light);
+      pointer-events: none;
+    }
+
+    /* ==========================================================
+       LEADS DATA TABLE & CARD LAYOUT
+       ========================================================= */
+    .leads-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-subtle);
+      overflow: hidden;
+    }
+
+    /* Desktop Table */
+    .table-responsive {
+      width: 100%;
+      overflow-x: auto;
+    }
+
+    .crm-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 13.5px;
+    }
+
+    .crm-table th {
+      background: #f9fafb;
+      padding: 12px 16px;
+      color: var(--text-muted);
+      font-weight: 600;
+      border-bottom: 1px solid var(--border-color);
+      white-space: nowrap;
+    }
+
+    .crm-table td {
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--border-color);
+      vertical-align: middle;
+      color: var(--text-main);
+    }
+
+    .crm-table tbody tr:hover {
+      background: #fafafa;
+    }
+
+    /* User Profile in Table */
+    .user-profile-cell {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .user-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: #e0e7ff;
+      color: #4338ca;
+      font-weight: 700;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .user-info-text {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .user-name {
+      font-weight: 600;
+      color: var(--text-main);
+    }
+
+    .user-time {
+      font-size: 11.5px;
+      color: var(--text-light);
+    }
+
+    /* Status Badges */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 10px;
+      border-radius: 9999px;
+      font-size: 12px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    .badge-today {
+      background: #dcfce7;
+      color: #15803d;
+      border: 1px solid #bbf7d0;
+    }
+
+    .badge-tomorrow {
+      background: #fef3c7;
+      color: #b45309;
+      border: 1px solid #fde68a;
+    }
+
+    .badge-upcoming {
+      background: #e0e7ff;
+      color: #4338ca;
+      border: 1px solid #c7d2fe;
+    }
+
+    /* Action Buttons in Row */
+    .row-actions {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-action-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid var(--border-color);
+      background: #ffffff;
+      color: var(--text-main);
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.15s ease;
+    }
+
+    .btn-action-icon:hover {
+      background: #f3f4f6;
+    }
+
+    .btn-call {
+      color: #2563eb;
+    }
+
+    .btn-wa {
+      color: #16a34a;
+    }
+
+    .btn-notes {
+      padding: 6px 10px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-color);
+      background: #ffffff;
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--text-main);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      transition: all 0.15s ease;
+    }
+
+    .btn-notes:hover {
+      background: var(--primary-light);
+      border-color: #c7d2fe;
+      color: var(--primary);
+    }
+
+    .btn-notes.has-notes {
+      background: #f0fdf4;
+      border-color: #bbf7d0;
+      color: #16a34a;
+    }
+
+    /* Mobile Cards View (Rule 7: Tables become cards on mobile) */
+    .mobile-cards-list {
+      display: none;
+      flex-direction: column;
+      gap: 12px;
+      padding: 12px;
+    }
+
+    @media (max-width: 767px) {
+      .table-responsive {
+        display: none;
+      }
+      .mobile-cards-list {
+        display: flex;
+      }
+    }
+
+    .lead-mobile-card {
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .mobile-card-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .mobile-card-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding-top: 8px;
+      border-top: 1px solid #f3f4f6;
+    }
+
+    /* Empty state */
+    .empty-state {
+      padding: 48px 16px;
+      text-align: center;
+      color: var(--text-muted);
+    }
+
+    .empty-state svg {
+      width: 48px;
+      height: 48px;
+      color: var(--text-light);
+      margin-bottom: 12px;
+    }
+
+    /* ==========================================================
+       NOTES MODAL / DRAWER
+       ========================================================= */
+    .notes-modal-backdrop {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(17, 24, 39, 0.5);
+      backdrop-filter: blur(4px);
+      z-index: 10001;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+
+    .notes-modal-backdrop.active {
+      display: flex;
+    }
+
+    .notes-card {
+      background: #ffffff;
+      border-radius: var(--radius-lg);
+      width: 100%;
+      max-width: 500px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      max-height: 90vh;
+    }
+
+    .notes-card-header {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #fafafa;
+    }
+
+    .notes-card-header h3 {
+      font-size: 16px;
+      font-weight: 700;
+    }
+
+    .close-btn {
+      background: none;
+      border: none;
+      font-size: 20px;
+      color: var(--text-muted);
+      cursor: pointer;
+      line-height: 1;
+    }
+
+    .notes-card-body {
+      padding: 16px 20px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .existing-notes-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      max-height: 240px;
+      overflow-y: auto;
+    }
+
+    .note-item {
+      background: #f9fafb;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      padding: 10px 12px;
+      font-size: 13px;
+    }
+
+    .note-time {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    .add-note-box textarea {
+      width: 100%;
+      height: 80px;
+      padding: 10px;
+      border: 1.5px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      font-family: inherit;
+      font-size: 13.5px;
+      outline: none;
+      resize: vertical;
+    }
+
+    .add-note-box textarea:focus {
+      border-color: var(--primary);
+    }
+
+    .notes-card-footer {
+      padding: 12px 20px;
+      border-top: 1px solid var(--border-color);
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      background: #fafafa;
+    }
+
+    /* Toast */
+    .admin-toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: #111827;
+      color: #ffffff;
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-size: 13.5px;
+      font-weight: 600;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+      z-index: 10002;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: all 0.25s ease;
+      pointer-events: none;
+    }
+
+    .admin-toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ==========================================================
+       PASSKEY LOGIN GATEWAY
+       ========================================================= -->
+  <div class="login-overlay" id="loginOverlay">
+    <div class="login-card">
+      <div class="login-icon-box">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+          <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+        </svg>
+      </div>
+      <h2>Maden Nova 1 — Admin</h2>
+      <p>Enter the master security passkey to access client leads and CRM data.</p>
+      <form id="loginForm">
+        <input 
+          type="password" 
+          id="passkeyInput" 
+          class="input-field" 
+          placeholder="Enter Passkey" 
+          required 
+          autocomplete="current-password"
+          autofocus
+        >
+        <button type="submit" class="btn-primary">
+          <span>Access CRM Dashboard</span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M5 12h14"></path>
+            <path d="M12 5l7 7-7 7"></path>
+          </svg>
+        </button>
+        <div class="login-error" id="loginError">Invalid passkey. Access denied.</div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==========================================================
+       CRM DASHBOARD LAYOUT
+       ========================================================= -->
+  <div class="dashboard-layout" id="dashboardLayout">
+    
+    <!-- Top Navigation Bar -->
+    <header class="top-navbar">
+      <div class="brand-group">
+        <span class="brand-logo-badge">CRM</span>
+        <div class="brand-titles">
+          <h1>Maden Nova 1 — Leads Manager</h1>
+          <span>Sector 5, Taloja Phase 1 Real Estate CRM</span>
+        </div>
+      </div>
+      <div class="nav-actions">
+        <button class="btn-outline" id="refreshBtn" title="Refresh leads from Firebase">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="23 4 23 10 17 10"></polyline>
+            <polyline points="1 20 1 14 7 14"></polyline>
+            <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+          </svg>
+          <span>Refresh</span>
+        </button>
+        <a href="index.html" class="btn-outline" target="_blank" title="View Landing Page">
+          <span>View Site</span>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+            <polyline points="15 3 21 3 21 9"></polyline>
+            <line x1="10" y1="14" x2="21" y2="3"></line>
+          </svg>
+        </a>
+        <button class="btn-outline" id="logoutBtn" style="color: var(--danger); border-color: #fee2e2;">
+          <span>Logout</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="main-container">
+      
+      <!-- Metrics Overview Cards -->
+      <section class="metrics-grid">
+        <div class="metric-card">
+          <div class="metric-info">
+            <h4>Total Inquiries</h4>
+            <div class="metric-num" id="totalLeadsCount">0</div>
+          </div>
+          <div class="metric-badge-icon icon-indigo">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+              <circle cx="9" cy="7" r="4"></circle>
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+              <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+            </svg>
+          </div>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-info">
+            <h4>Visits Today</h4>
+            <div class="metric-num" id="todayVisitsCount" style="color: var(--success);">0</div>
+          </div>
+          <div class="metric-badge-icon icon-green">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+              <line x1="16" y1="2" x2="16" y2="6"></line>
+              <line x1="8" y1="2" x2="8" y2="6"></line>
+              <line x1="3" y1="10" x2="21" y2="10"></line>
+            </svg>
+          </div>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-info">
+            <h4>Visits Tomorrow</h4>
+            <div class="metric-num" id="tomorrowVisitsCount" style="color: var(--warning);">0</div>
+          </div>
+          <div class="metric-badge-icon icon-amber">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <polyline points="12 6 12 12 16 14"></polyline>
+            </svg>
+          </div>
+        </div>
+      </section>
+
+      <!-- Filters & Search Controls -->
+      <section class="controls-panel">
+        <div class="filter-pills" role="tablist">
+          <button class="filter-btn active" data-filter="all">All Inquiries</button>
+          <button class="filter-btn" data-filter="today">Today's Visits</button>
+          <button class="filter-btn" data-filter="tomorrow">Tomorrow's Visits</button>
+          <button class="filter-btn" data-filter="upcoming">Upcoming (7 Days)</button>
+          <button class="filter-btn" data-filter="has_notes">With Notes</button>
+        </div>
+
+        <div class="search-box-wrapper">
+          <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <input type="text" class="search-input" id="searchInput" placeholder="Search by name or phone...">
+        </div>
+      </section>
+
+      <!-- Leads Data Presentation (Table on Desktop, Cards on Mobile) -->
+      <section class="leads-card">
+        
+        <!-- Desktop Table View -->
+        <div class="table-responsive">
+          <table class="crm-table">
+            <thead>
+              <tr>
+                <th>Customer Name</th>
+                <th>Phone Number</th>
+                <th>Site Visit Date</th>
+                <th>Conversation Notes</th>
+                <th style="text-align: right;">Quick Actions</th>
+              </tr>
+            </thead>
+            <tbody id="leadsTableBody">
+              <!-- Dynamically populated -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Mobile Cards View -->
+        <div class="mobile-cards-list" id="leadsMobileCards">
+          <!-- Dynamically populated -->
+        </div>
+
+        <!-- Empty State -->
+        <div class="empty-state" id="emptyState" style="display: none;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="8" y1="12" x2="16" y2="12"></line>
+          </svg>
+          <h3>No matching inquiries found</h3>
+          <p>Try clearing filters or search keywords.</p>
+        </div>
+
+      </section>
+
+    </main>
+  </div>
+
+  <!-- ==========================================================
+       CONVERSATION NOTES MODAL
+       ========================================================= -->
+  <div class="notes-modal-backdrop" id="notesModal">
+    <div class="notes-card">
+      <div class="notes-card-header">
+        <div>
+          <h3 id="notesClientName">Lead Notes</h3>
+          <span style="font-size: 12px; color: var(--text-muted);" id="notesClientPhone">+91 ...</span>
+        </div>
+        <button class="close-btn" id="closeNotesModalBtn">&times;</button>
+      </div>
+
+      <div class="notes-card-body">
+        <label style="font-size: 12.5px; font-weight: 700; color: var(--text-muted);">PREVIOUS NOTES & TALKING POINTS</label>
+        <div class="existing-notes-list" id="notesListContainer">
+          <!-- List of timestamped notes -->
+        </div>
+
+        <div class="add-note-box">
+          <label style="font-size: 12.5px; font-weight: 700; color: var(--text-main); margin-bottom: 6px; display: block;">
+            Add New Note / Conversation Summary
+          </label>
+          <textarea id="newNoteText" placeholder="e.g. Discussed 2BHK payment plan, customer interested in 3rd floor unit, visiting at 4 PM..."></textarea>
+        </div>
+      </div>
+
+      <div class="notes-card-footer">
+        <button class="btn-outline" id="cancelNoteBtn">Cancel</button>
+        <button class="btn-primary" id="saveNoteBtn" style="width: auto;">Save Note</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Notification Toast -->
+  <div class="admin-toast" id="adminToast">Action successful</div>
+
+  <!-- ==========================================================
+       ADMIN JAVASCRIPT & FIREBASE INTEGRATION
+       ========================================================= -->
+  <script>
+    const MASTER_KEY = "mudassirs4723";
+    const FIREBASE_BASE_URL = "https://sample-firebase-ai-app-ba30f-default-rtdb.firebaseio.com";
+    const FIREBASE_SECRET = "iYUsh2KFKYgJuhESJaw1gbV1IBentiFn1Kdy8x6I";
+
+    // State
+    let rawLeads = [];
+    let currentFilter = "all";
+    let activeLeadId = null;
+
+    // Elements
+    const loginOverlay = document.getElementById('loginOverlay');
+    const loginForm = document.getElementById('loginForm');
+    const passkeyInput = document.getElementById('passkeyInput');
+    const loginError = document.getElementById('loginError');
+    const logoutBtn = document.getElementById('logoutBtn');
+    const refreshBtn = document.getElementById('refreshBtn');
+    const searchInput = document.getElementById('searchInput');
+
+    const totalLeadsCount = document.getElementById('totalLeadsCount');
+    const todayVisitsCount = document.getElementById('todayVisitsCount');
+    const tomorrowVisitsCount = document.getElementById('tomorrowVisitsCount');
+
+    const tableBody = document.getElementById('leadsTableBody');
+    const mobileCards = document.getElementById('leadsMobileCards');
+    const emptyState = document.getElementById('emptyState');
+
+    // Notes modal elements
+    const notesModal = document.getElementById('notesModal');
+    const closeNotesModalBtn = document.getElementById('closeNotesModalBtn');
+    const cancelNoteBtn = document.getElementById('cancelNoteBtn');
+    const saveNoteBtn = document.getElementById('saveNoteBtn');
+    const notesListContainer = document.getElementById('notesListContainer');
+    const newNoteText = document.getElementById('newNoteText');
+    const notesClientName = document.getElementById('notesClientName');
+    const notesClientPhone = document.getElementById('notesClientPhone');
+
+    const toast = document.getElementById('adminToast');
+
+    function showToast(msg) {
+      toast.textContent = msg;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 3000);
+    }
+
+    // -------------------------------------------------------------
+    // Authentication Check
+    // -------------------------------------------------------------
+    function checkAuth() {
+      const isAuth = sessionStorage.getItem('admin_authenticated');
+      if (isAuth === 'true') {
+        loginOverlay.style.display = 'none';
+        fetchLeads();
+      } else {
+        loginOverlay.style.display = 'flex';
+        passkeyInput.focus();
+      }
+    }
+
+    loginForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const enteredKey = passkeyInput.value.trim();
+      if (enteredKey === MASTER_KEY) {
+        sessionStorage.setItem('admin_authenticated', 'true');
+        loginError.style.display = 'none';
+        loginOverlay.style.display = 'none';
+        showToast("Access Granted");
+        fetchLeads();
+      } else {
+        loginError.style.display = 'block';
+        passkeyInput.value = '';
+        passkeyInput.focus();
+      }
+    });
+
+    logoutBtn.addEventListener('click', () => {
+      sessionStorage.removeItem('admin_authenticated');
+      window.location.reload();
+    });
+
+    // -------------------------------------------------------------
+    // Fetch Leads from Firebase Realtime Database
+    // -------------------------------------------------------------
+    async function fetchLeads() {
+      try {
+        refreshBtn.classList.add('loading');
+        const url = `${FIREBASE_BASE_URL}/leads.json?auth=${encodeURIComponent(FIREBASE_SECRET)}`;
+        const res = await fetch(url);
+        const data = await res.json();
+
+        rawLeads = [];
+        if (data) {
+          Object.keys(data).forEach(id => {
+            rawLeads.push({
+              id,
+              ...data[id]
+            });
+          });
+          // Sort newest first
+          rawLeads.sort((a, b) => new Date(b.timestamp || 0) - new Date(a.timestamp || 0));
+        }
+
+        updateMetrics();
+        renderLeads();
+      } catch (err) {
+        console.error("Error fetching leads:", err);
+        showToast("Error loading leads from database.");
+      } finally {
+        refreshBtn.classList.remove('loading');
+      }
+    }
+
+    refreshBtn.addEventListener('click', () => {
+      fetchLeads();
+      showToast("Refreshing leads...");
+    });
+
+    // -------------------------------------------------------------
+    // Date Helpers & Metrics Calculation
+    // -------------------------------------------------------------
+    function isTodayVisit(dateStr) {
+      if (!dateStr) return false;
+      const lower = dateStr.toLowerCase();
+      if (lower.includes('today')) return true;
+      const now = new Date();
+      const day = now.getDate();
+      return lower.includes(`${day} `) || lower.includes(`${day}nov`) || lower.includes(`${day} nov`);
+    }
+
+    function isTomorrowVisit(dateStr) {
+      if (!dateStr) return false;
+      const lower = dateStr.toLowerCase();
+      if (lower.includes('tomorrow')) return true;
+      const now = new Date();
+      now.setDate(now.getDate() + 1);
+      const day = now.getDate();
+      return lower.includes(`${day} `) || lower.includes(`${day}nov`) || lower.includes(`${day} nov`);
+    }
+
+    function updateMetrics() {
+      totalLeadsCount.textContent = rawLeads.length;
+
+      const todayCount = rawLeads.filter(l => isTodayVisit(l.siteVisitDate)).length;
+      todayVisitsCount.textContent = todayCount;
+
+      const tomorrowCount = rawLeads.filter(l => isTomorrowVisit(l.siteVisitDate)).length;
+      tomorrowVisitsCount.textContent = tomorrowCount;
+    }
+
+    // -------------------------------------------------------------
+    // Render Leads List (Table & Cards)
+    // -------------------------------------------------------------
+    function getFilteredLeads() {
+      const query = searchInput.value.toLowerCase().trim();
+
+      return rawLeads.filter(lead => {
+        // Search filter
+        const matchSearch = (lead.name || '').toLowerCase().includes(query) ||
+                            (lead.phone || '').toLowerCase().includes(query);
+        if (!matchSearch) return false;
+
+        // Pill filter
+        if (currentFilter === 'today') return isTodayVisit(lead.siteVisitDate);
+        if (currentFilter === 'tomorrow') return isTomorrowVisit(lead.siteVisitDate);
+        if (currentFilter === 'upcoming') return !lead.siteVisitDate?.toLowerCase().includes('not specified');
+        if (currentFilter === 'has_notes') return lead.notes && lead.notes.length > 0;
+
+        return true; // "all"
+      });
+    }
+
+    function renderLeads() {
+      const filtered = getFilteredLeads();
+
+      tableBody.innerHTML = '';
+      mobileCards.innerHTML = '';
+
+      if (filtered.length === 0) {
+        emptyState.style.display = 'block';
+        return;
+      }
+      emptyState.style.display = 'none';
+
+      filtered.forEach(lead => {
+        const initials = (lead.name || 'U').substring(0, 2).toUpperCase();
+        const visitDate = lead.siteVisitDate || 'Not Specified';
+        
+        let badgeClass = 'badge-upcoming';
+        if (isTodayVisit(visitDate)) badgeClass = 'badge-today';
+        else if (isTomorrowVisit(visitDate)) badgeClass = 'badge-tomorrow';
+
+        const notesCount = (lead.notes && lead.notes.length) || 0;
+        const notesBtnLabel = notesCount > 0 ? `${notesCount} Note${notesCount > 1 ? 's' : ''}` : '+ Add Note';
+        const notesBtnClass = notesCount > 0 ? 'has-notes' : '';
+
+        const cleanPhone = (lead.phone || '').replace(/[^0-9+]/g, '');
+
+        // Formatted timestamp
+        let formattedTime = 'Recently';
+        if (lead.timestamp) {
+          const d = new Date(lead.timestamp);
+          formattedTime = d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+        }
+
+        // 1. Table Row (Desktop)
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>
+            <div class="user-profile-cell">
+              <div class="user-avatar">${initials}</div>
+              <div class="user-info-text">
+                <span class="user-name">${escapeHTML(lead.name || 'Unnamed')}</span>
+                <span class="user-time">Submitted: ${formattedTime}</span>
+              </div>
+            </div>
+          </td>
+          <td>
+            <strong>${escapeHTML(lead.phone || '-')}</strong>
+          </td>
+          <td>
+            <span class="badge ${badgeClass}">${escapeHTML(visitDate)}</span>
+          </td>
+          <td>
+            <button class="btn-notes ${notesBtnClass}" onclick="openNotesModal('${lead.id}')">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
+                <line x1="16" y1="13" x2="8" y2="13"></line>
+                <line x1="16" y1="17" x2="8" y2="17"></line>
+              </svg>
+              <span>${notesBtnLabel}</span>
+            </button>
+          </td>
+          <td style="text-align: right;">
+            <div class="row-actions" style="justify-content: flex-end;">
+              <a href="tel:${cleanPhone}" class="btn-action-icon btn-call" title="Call Client">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+                </svg>
+              </a>
+              <a href="https://wa.me/${cleanPhone.replace('+', '')}?text=Hi%20${encodeURIComponent(lead.name || '')}%2C%20thank%20you%20for%20your%20interest%20in%20Maden%20Nova%201%20Taloja." target="_blank" class="btn-action-icon btn-wa" title="Open WhatsApp Chat">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981z"/>
+                </svg>
+              </a>
+            </div>
+          </td>
+        `;
+        tableBody.appendChild(tr);
+
+        // 2. Mobile Card (Mobile Responsive)
+        const card = document.createElement('div');
+        card.className = 'lead-mobile-card';
+        card.innerHTML = `
+          <div class="mobile-card-top">
+            <div class="user-profile-cell">
+              <div class="user-avatar">${initials}</div>
+              <div class="user-info-text">
+                <span class="user-name">${escapeHTML(lead.name || 'Unnamed')}</span>
+                <strong style="font-size: 13px;">${escapeHTML(lead.phone || '-')}</strong>
+              </div>
+            </div>
+            <span class="badge ${badgeClass}">${escapeHTML(visitDate)}</span>
+          </div>
+
+          <div style="font-size: 11.5px; color: var(--text-light);">
+            Submitted: ${formattedTime}
+          </div>
+
+          <div class="mobile-card-actions">
+            <button class="btn-notes ${notesBtnClass}" style="flex: 1; justify-content: center;" onclick="openNotesModal('${lead.id}')">
+              <span>${notesBtnLabel}</span>
+            </button>
+            <a href="tel:${cleanPhone}" class="btn-action-icon btn-call" title="Call">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3">
+                <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+              </svg>
+            </a>
+            <a href="https://wa.me/${cleanPhone.replace('+', '')}?text=Hi%20${encodeURIComponent(lead.name || '')}%2C%20thank%20you%20for%20your%20interest%20in%20Maden%20Nova%201." target="_blank" class="btn-action-icon btn-wa" title="WhatsApp">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981z"/>
+              </svg>
+            </a>
+          </div>
+        `;
+        mobileCards.appendChild(card);
+      });
+    }
+
+    function escapeHTML(str) {
+      return String(str).replace(/[&<>'"]/g, 
+        tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
+      );
+    }
+
+    // -------------------------------------------------------------
+    // Filter & Search Event Listeners
+    // -------------------------------------------------------------
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentFilter = btn.getAttribute('data-filter');
+        renderLeads();
+      });
+    });
+
+    searchInput.addEventListener('input', renderLeads);
+
+    // -------------------------------------------------------------
+    // Notes Modal Management (Read & Save to Firebase)
+    // -------------------------------------------------------------
+    window.openNotesModal = function(leadId) {
+      activeLeadId = leadId;
+      const lead = rawLeads.find(l => l.id === leadId);
+      if (!lead) return;
+
+      notesClientName.textContent = lead.name || 'Client Notes';
+      notesClientPhone.textContent = `Phone: ${lead.phone || '-'} | Site Visit: ${lead.siteVisitDate || '-'}`;
+      newNoteText.value = '';
+
+      renderNotesList(lead.notes || []);
+
+      notesModal.classList.add('active');
+      newNoteText.focus();
+    };
+
+    function closeNotesModal() {
+      notesModal.classList.remove('active');
+      activeLeadId = null;
+    }
+
+    closeNotesModalBtn.addEventListener('click', closeNotesModal);
+    cancelNoteBtn.addEventListener('click', closeNotesModal);
+
+    notesModal.addEventListener('click', (e) => {
+      if (e.target === notesModal) closeNotesModal();
+    });
+
+    function renderNotesList(notes) {
+      notesListContainer.innerHTML = '';
+      if (!notes || notes.length === 0) {
+        notesListContainer.innerHTML = '<div style="font-size: 13px; color: var(--text-light); text-align: center; padding: 12px;">No conversation notes recorded yet. Add one below.</div>';
+        return;
+      }
+
+      notes.forEach(item => {
+        const div = document.createElement('div');
+        div.className = 'note-item';
+        const timeStr = item.createdAt ? new Date(item.createdAt).toLocaleString('en-IN') : 'Just now';
+        div.innerHTML = `
+          <div>${escapeHTML(item.text)}</div>
+          <div class="note-time">${timeStr}</div>
+        `;
+        notesListContainer.appendChild(div);
+      });
+    }
+
+    saveNoteBtn.addEventListener('click', async () => {
+      const noteText = newNoteText.value.trim();
+      if (!noteText) {
+        showToast("Please enter a note before saving.");
+        return;
+      }
+
+      if (!activeLeadId) return;
+
+      const lead = rawLeads.find(l => l.id === activeLeadId);
+      if (!lead) return;
+
+      saveNoteBtn.disabled = true;
+      saveNoteBtn.textContent = 'Saving...';
+
+      const existingNotes = lead.notes || [];
+      const newNoteObj = {
+        text: noteText,
+        createdAt: new Date().toISOString()
+      };
+      const updatedNotes = [...existingNotes, newNoteObj];
+
+      try {
+        // Direct Firebase RTDB PATCH
+        const patchUrl = `${FIREBASE_BASE_URL}/leads/${activeLeadId}.json?auth=${encodeURIComponent(FIREBASE_SECRET)}`;
+        const res = await fetch(patchUrl, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ notes: updatedNotes })
+        });
+
+        if (res.ok) {
+          lead.notes = updatedNotes;
+          renderNotesList(updatedNotes);
+          renderLeads();
+          newNoteText.value = '';
+          showToast("Conversation note saved successfully!");
+        } else {
+          showToast("Failed to save note to database.");
+        }
+      } catch (err) {
+        console.error("Save note error:", err);
+        showToast("Network error saving note.");
+      } finally {
+        saveNoteBtn.disabled = false;
+        saveNoteBtn.textContent = 'Save Note';
+      }
+    });
+
+    // Check auth on load
+    checkAuth();
+  </script>
+</body>
+</html>
