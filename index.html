@@ -17,6 +17,26 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 
+  <!-- Meta Pixel Code -->
+  <script>
+    !function(f,b,e,v,n,t,s)
+    {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+    n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+    if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+    n.queue=[];t=b.createElement(e);t.async=!0;
+    t.src=v;s=b.getElementsByTagName(e)[0];
+    s.parentNode.insertBefore(t,s)}(window, document,'script',
+    'https://connect.facebook.net/en_US/fbevents.js');
+    fbq('init', '29967878912817416');
+    fbq('track', 'PageView');
+  </script>
+  <noscript>
+    <img height="1" width="1" style="display:none"
+      src="https://www.facebook.com/tr?id=29967878912817416&ev=PageView&noscript=1"
+    />
+  </noscript>
+  <!-- End Meta Pixel Code -->
+
   <style>
     /* ==========================================================
        RESET & BASE DESIGN SYSTEM
@@ -1594,6 +1614,21 @@
         if (mainCtaBar) mainCtaBar.classList.add('has-whatsapp');
         if (shareWhatsAppBtn) shareWhatsAppBtn.href = waUrl;
 
+        // 3. Track Meta Pixel Events (Lead & Schedule)
+        if (typeof fbq === 'function') {
+          fbq('track', 'Lead', {
+            content_name: 'Maden Nova 1 - Payment Plan & Site Visit',
+            content_category: 'Real Estate Leads',
+            value: 0.00,
+            currency: 'INR',
+            site_visit_date: siteVisitDate
+          });
+          fbq('track', 'Schedule', {
+            content_name: 'Maden Nova 1 Site Visit',
+            scheduled_date: siteVisitDate
+          });
+        }
+
         showToast(`Thank you ${name}! Visit scheduled for ${siteVisitDate}.`);
         paymentForm.reset();
         setupDateChips();
@@ -1607,6 +1642,18 @@
         submitBtn.innerHTML = originalBtnHTML;
       }
     });
+
+    // Track WhatsApp discussions in Meta Pixel as Contact events
+    function trackWhatsAppClick() {
+      if (typeof fbq === 'function') {
+        fbq('track', 'Contact', {
+          content_name: 'WhatsApp Consultation - Maden Nova 1',
+          content_category: 'WhatsApp Inquiry'
+        });
+      }
+    }
+    if (modalWhatsappBtn) modalWhatsappBtn.addEventListener('click', trackWhatsAppClick);
+    if (shareWhatsAppBtn) shareWhatsAppBtn.addEventListener('click', trackWhatsAppClick);
   </script>
 </body>
 </html>
