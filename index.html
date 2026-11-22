@@ -933,140 +933,155 @@
         margin: 0;
         padding: 0;
         min-height: 100dvh;
+        background: #ffffff;
       }
 
       .flyer-container {
         min-height: 100dvh;
+        display: flex;
+        flex-direction: column;
         justify-content: flex-start;
+        box-shadow: none;
       }
 
+      /* On standard/tall mobile phones (Android / large iOS):
+         Let hero image display comfortably up to 36dvh */
       .hero-wrapper {
-        max-height: clamp(140px, 24dvh, 230px);
+        width: 100%;
+        max-height: 36dvh;
         display: flex;
         align-items: center;
         justify-content: center;
         background: #ffffff;
+        flex-shrink: 0;
       }
 
       .hero-image {
-        max-height: clamp(140px, 24dvh, 230px);
         width: 100%;
+        max-height: 36dvh;
         object-fit: contain;
       }
 
       .content-body {
-        padding: clamp(6px, 1.1dvh, 12px) clamp(10px, 2.5vw, 16px) clamp(6px, 1.3dvh, 14px) clamp(10px, 2.5vw, 16px);
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        padding: 12px 14px 14px 14px;
+        width: 100%;
       }
 
-      .brand-title {
-        font-size: clamp(18px, 2.7dvh, 23px);
-        margin-bottom: clamp(1px, 0.3dvh, 3px);
-      }
-
-      .location-bar {
-        margin-bottom: clamp(3px, 0.6dvh, 7px);
-        gap: 6px;
-      }
-
-      .location-badge {
-        font-size: clamp(11.5px, 1.7dvh, 13.5px);
-      }
-
-      .ribbon-badge {
-        padding: clamp(3px, 0.5dvh, 5px) clamp(10px, 2vw, 14px);
-        margin-bottom: clamp(4px, 0.7dvh, 9px);
-      }
-
-      .ribbon-text {
-        font-size: clamp(10.5px, 1.6dvh, 12.5px);
-      }
-
-      .tagline {
-        font-size: clamp(14px, 2.1dvh, 17px);
-        margin-bottom: clamp(4px, 0.7dvh, 9px);
-      }
-
-      .highlights-grid {
-        margin-bottom: clamp(4px, 0.7dvh, 9px);
-      }
-
-      .highlight-icon-box {
-        width: clamp(24px, 3.5dvh, 30px);
-        height: clamp(24px, 3.5dvh, 30px);
-        margin-bottom: clamp(1px, 0.3dvh, 3px);
-      }
-
-      .highlight-icon-box svg {
-        width: clamp(20px, 3.1dvh, 26px);
-        height: clamp(20px, 3.1dvh, 26px);
-      }
-
-      .highlight-text {
-        font-size: clamp(9px, 1.45dvh, 11px);
-        line-height: 1.2;
-      }
-
-      .highlight-divider {
-        height: clamp(26px, 3.6dvh, 36px);
-        margin-top: 2px;
-      }
-
-      .property-desc {
-        font-size: clamp(10px, 1.5dvh, 12px);
-        line-height: 1.35;
-        margin-bottom: clamp(4px, 0.7dvh, 9px);
-      }
-
-      .why-choose-card {
-        padding: clamp(5px, 0.8dvh, 9px) clamp(10px, 2vw, 14px);
-        margin-bottom: clamp(4px, 0.7dvh, 9px);
-      }
-
-      .why-title {
-        font-size: clamp(13px, 1.9dvh, 15.5px);
-        margin-bottom: clamp(2px, 0.3dvh, 5px);
-      }
-
-      .benefits-list {
-        gap: clamp(1px, 0.3dvh, 4px);
-      }
-
-      .benefit-item {
-        font-size: clamp(10.5px, 1.55dvh, 12.5px);
-      }
-
-      .benefit-check {
-        width: clamp(12px, 1.7dvh, 15px);
-        height: clamp(12px, 1.7dvh, 15px);
-      }
-
-      .map-preview-card {
-        max-height: clamp(36px, 5.2dvh, 48px);
-        margin-bottom: clamp(3px, 0.5dvh, 6px);
-      }
-
-      .site-address-strip {
-        padding: clamp(3px, 0.45dvh, 5px) 8px;
-        margin-top: -2px;
-        margin-bottom: clamp(4px, 0.7dvh, 9px);
-        font-size: clamp(9.5px, 1.45dvh, 11px);
-      }
-
+      /* Anchor action button & footer to the bottom of the screen */
       .cta-segmented-bar {
-        margin-bottom: clamp(4px, 0.7dvh, 9px);
-      }
-
-      .btn-seg-payment {
-        padding: clamp(8px, 1.3dvh, 12px) 16px;
-        font-size: clamp(12.5px, 1.85dvh, 14.5px);
+        margin-top: auto;
+        margin-bottom: 12px;
       }
 
       .footer-divider-section {
         padding-top: 0;
+        margin-bottom: 4px;
+      }
+    }
+
+    /* SHORT SCREEN OPTIMIZATION (iPhone with Safari/Chrome toolbars < 740px height):
+       Scale down hero and vertical gaps so CTA button is never pushed off screen */
+    @media (max-height: 740px) and (max-width: 640px) {
+      .hero-wrapper, .hero-image {
+        max-height: 23dvh !important;
       }
 
-      .footer-script-text {
-        font-size: clamp(11.5px, 1.7dvh, 14px);
+      .content-body {
+        padding: 6px 12px 10px 12px !important;
+      }
+
+      .brand-title {
+        font-size: 19px !important;
+        margin-bottom: 2px !important;
+      }
+
+      .location-bar {
+        margin-bottom: 4px !important;
+      }
+
+      .ribbon-badge {
+        padding: 3px 10px !important;
+        margin-bottom: 5px !important;
+      }
+
+      .ribbon-text {
+        font-size: 11px !important;
+      }
+
+      .tagline {
+        font-size: 14.5px !important;
+        margin-bottom: 5px !important;
+      }
+
+      .highlights-grid {
+        margin-bottom: 5px !important;
+      }
+
+      .highlight-icon-box {
+        width: 24px !important;
+        height: 24px !important;
+        margin-bottom: 2px !important;
+      }
+
+      .highlight-icon-box svg {
+        width: 20px !important;
+        height: 20px !important;
+      }
+
+      .highlight-text {
+        font-size: 9.5px !important;
+      }
+
+      .highlight-divider {
+        height: 28px !important;
+      }
+
+      .property-desc {
+        font-size: 10.5px !important;
+        line-height: 1.35 !important;
+        margin-bottom: 5px !important;
+      }
+
+      .why-choose-card {
+        padding: 5px 10px !important;
+        margin-bottom: 5px !important;
+      }
+
+      .why-title {
+        font-size: 13.5px !important;
+        margin-bottom: 3px !important;
+      }
+
+      .benefits-list {
+        gap: 2px !important;
+      }
+
+      .benefit-item {
+        font-size: 11px !important;
+      }
+
+      .map-preview-card {
+        max-height: 38px !important;
+        margin-bottom: 3px !important;
+      }
+
+      .site-address-strip {
+        padding: 3px 8px !important;
+        margin-bottom: 6px !important;
+        font-size: 10px !important;
+      }
+
+      .btn-seg-payment {
+        padding: 9px 14px !important;
+        font-size: 13px !important;
+      }
+
+      .cta-segmented-bar {
+        margin-top: auto !important;
+        margin-bottom: 6px !important;
       }
     }
   </style>
