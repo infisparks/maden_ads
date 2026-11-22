@@ -1035,11 +1035,14 @@
     }
 
     // -------------------------------------------------------------
-    // Authentication Check
+    // Authentication Check (Persistent Device Login via localStorage)
     // -------------------------------------------------------------
     function checkAuth() {
-      const isAuth = sessionStorage.getItem('admin_authenticated');
-      if (isAuth === 'true') {
+      const isAuth = localStorage.getItem('admin_authenticated');
+      const savedKey = localStorage.getItem('admin_passkey');
+
+      // If user previously entered valid passkey on this device, auto-login
+      if (isAuth === 'true' && savedKey === MASTER_KEY) {
         loginOverlay.style.display = 'none';
         fetchLeads();
       } else {
@@ -1052,10 +1055,12 @@
       e.preventDefault();
       const enteredKey = passkeyInput.value.trim();
       if (enteredKey === MASTER_KEY) {
-        sessionStorage.setItem('admin_authenticated', 'true');
+        // Save permanently on this phone/browser so it never asks again
+        localStorage.setItem('admin_authenticated', 'true');
+        localStorage.setItem('admin_passkey', MASTER_KEY);
         loginError.style.display = 'none';
         loginOverlay.style.display = 'none';
-        showToast("Access Granted");
+        showToast("Access Granted • Saved to this device");
         fetchLeads();
       } else {
         loginError.style.display = 'block';
@@ -1065,8 +1070,13 @@
     });
 
     logoutBtn.addEventListener('click', () => {
-      sessionStorage.removeItem('admin_authenticated');
-      window.location.reload();
+      localStorage.removeItem('admin_authenticated');
+      localStorage.removeItem('admin_passkey');
+      sessionStorage.clear();
+      showToast("Logged out successfully");
+      setTimeout(() => {
+        window.location.reload();
+      }, 500);
     });
 
     // -------------------------------------------------------------
