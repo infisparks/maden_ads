@@ -8,6 +8,7 @@
 const DEFAULT_FIREBASE_DB_URL = "https://sample-firebase-ai-app-ba30f-default-rtdb.firebaseio.com";
 const DEFAULT_FIREBASE_SECRET = "iYUsh2KFKYgJuhESJaw1gbV1IBentiFn1Kdy8x6I";
 const DEFAULT_META_PIXEL_ID = "29967878912817416";
+const DEFAULT_META_ACCESS_TOKEN = "EAAMqZBlQQLCgBTD5mZC38gbH9Xc0iZA8OZCHV7QvlLyZBr4osm0QNBeGFAvsZCs3PfG6FccMEE8GUWHBFCm84UvdHVo7Kje4tIxZBE1ZBOeruBYOnRSE3tvEV5lLpPyh39Wk1ROOXlewtkvALcwdPPp2JCeRpmHcTsvxCMP8ZCt2bHTbzerdjTEPXaX8wDBXGIAZDZD";
 const ADMIN_PASSKEY = "mudassirs4723";
 
 /**
@@ -165,7 +166,8 @@ export default {
         // 5b. Meta Conversions API (CAPI) Deduplication Forwarding
         // Matches frontend fbq('track', 'Lead', ..., { eventID: leadData.eventId })
         const metaPixelId = env?.META_PIXEL_ID || DEFAULT_META_PIXEL_ID;
-        const metaAccessToken = env?.META_ACCESS_TOKEN || "";
+        const metaAccessToken = env?.META_ACCESS_TOKEN || DEFAULT_META_ACCESS_TOKEN;
+        let metaCapiResult = null;
 
         if (metaAccessToken) {
           const userAgent = request.headers.get("user-agent") || "";
@@ -203,24 +205,17 @@ export default {
 
           const metaApiUrl = `https://graph.facebook.com/v19.0/${metaPixelId}/events?access_token=${encodeURIComponent(metaAccessToken)}`;
 
-          const sendCapi = async () => {
-            try {
-              const capiRes = await fetch(metaApiUrl, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(capiPayload),
-              });
-              const capiData = await capiRes.json();
-              console.log("Meta CAPI response for eventId", leadData.eventId, ":", JSON.stringify(capiData));
-            } catch (capiErr) {
-              console.error("Meta CAPI forwarding error:", capiErr);
-            }
-          };
-
-          if (ctx && typeof ctx.waitUntil === "function") {
-            ctx.waitUntil(sendCapi());
-          } else {
-            await sendCapi();
+          try {
+            const capiRes = await fetch(metaApiUrl, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(capiPayload),
+            });
+            metaCapiResult = await capiRes.json();
+            console.log("Meta CAPI response for eventId", leadData.eventId, ":", JSON.stringify(metaCapiResult));
+          } catch (capiErr) {
+            console.error("Meta CAPI forwarding error:", capiErr);
+            metaCapiResult = { error: capiErr.message };
           }
         }
 
@@ -230,6 +225,7 @@ export default {
             message: "Lead recorded successfully!",
             id: fbData.name,
             eventId: leadData.eventId,
+            metaCapi: metaCapiResult,
           }),
           { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );

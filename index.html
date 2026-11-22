@@ -1584,7 +1584,8 @@
           });
           if (workerRes.ok) {
             saved = true;
-            console.log("Lead stored via Cloudflare Worker with eventId:", eventId);
+            const resData = await workerRes.json();
+            console.log("%c[Meta CAPI] Server Lead Sent & Received by Meta:", "color: #16a34a; font-weight: bold; font-size: 13px;", resData.metaCapi || resData);
           }
         } catch (workerErr) {
           console.warn("Worker not reachable, falling back to Firebase RTDB:", workerErr);
@@ -1632,6 +1633,8 @@
             content_name: 'Maden Nova 1 Site Visit',
             scheduled_date: siteVisitDate
           }, { eventID: eventId });
+
+          console.log("%c[Meta Pixel] Browser Lead Fired with eventID:", "color: #4f46e5; font-weight: bold; font-size: 13px;", eventId);
         }
 
         showToast(`Thank you ${name}! Visit scheduled for ${siteVisitDate}.`);
