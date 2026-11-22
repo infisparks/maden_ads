@@ -1062,11 +1062,11 @@
           <label class="form-label" for="userPhone">Phone Number (WhatsApp) <span>*</span></label>
           <input type="tel" id="userPhone" class="form-input" placeholder="e.g. +91 98765 43210" required autocomplete="tel">
         </div>
-        <!-- Site Visit Date (Quick 7 Upcoming Days) -->
+        <!-- Site Visit Date (Quick 8 Upcoming Days) -->
         <div class="form-group">
           <label class="form-label">Select Site Visit Date <span>*</span></label>
           <div class="date-chips-grid" id="dateChipsContainer">
-            <!-- Dynamically populated with 7 upcoming days -->
+            <!-- Dynamically populated with 8 upcoming days (4 per row x 2 rows) -->
           </div>
           <input type="hidden" id="siteVisitDate" required>
         </div>
@@ -1102,7 +1102,7 @@
     const siteVisitDateInput = document.getElementById('siteVisitDate');
 
     // -------------------------------------------------------------
-    // Generate Upcoming 7 Days for Quick 1-Tap Site Visit Selection
+    // Generate Upcoming 8 Days for Quick 1-Tap Site Visit Selection (4x2 Grid)
     // -------------------------------------------------------------
     const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
     const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -1111,7 +1111,7 @@
       dateChipsContainer.innerHTML = '';
       const baseDate = new Date(); // Today: 22 Nov
 
-      for (let i = 0; i < 7; i++) {
+      for (let i = 0; i < 8; i++) {
         const d = new Date(baseDate);
         d.setDate(baseDate.getDate() + i);
 
