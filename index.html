@@ -444,6 +444,35 @@
       gap: 6px;
     }
 
+    /* Exact Site Address Strip */
+    .site-address-strip {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      margin-top: -6px;
+      margin-bottom: 14px;
+      padding: 7px 12px;
+      background: #f1f5f9;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      font-size: 11.5px;
+      color: #334155;
+      font-weight: 600;
+      text-align: center;
+    }
+
+    .site-pin-icon {
+      width: 13px;
+      height: 13px;
+      color: #dc2626;
+      flex-shrink: 0;
+    }
+
+    .site-address-text {
+      line-height: 1.35;
+    }
+
     /* ==========================================================
        UNIFIED SEGMENTED ACTION BAR
        ========================================================= */
@@ -967,17 +996,19 @@
         </ul>
       </section>
 
-      <!-- Google Map Snippet Card -->
-      <div 
+      <!-- Google Map Snippet Card (Links to Live Google Maps Listing) -->
+      <a 
+        href="https://maps.app.goo.gl/cnNw4eFNBHvShDu2A" 
+        target="_blank" 
+        rel="noopener noreferrer"
         class="map-preview-card" 
         id="map-card"
-        title="Open Maden Nova 1 in Google Maps"
-        role="button"
-        tabindex="0"
+        title="Open Maden Nova 1 in Google Maps - Plot No. 100, Sector 5, Taloja Phase 1"
+        style="text-decoration: none; display: block;"
       >
         <img 
           src="image/map.png" 
-          alt="Location map showing Maden Nova 1 in Sector 5, Taloja Phase 1" 
+          alt="Location map showing Maden Nova 1 at Plot No. 100, Sector 5, Taloja Phase 1" 
           class="map-preview-img"
         >
         <div class="map-overlay">
@@ -988,6 +1019,14 @@
             <span>Open in Google Maps</span>
           </div>
         </div>
+      </a>
+
+      <!-- Exact Site Address Strip -->
+      <div class="site-address-strip">
+        <svg class="site-pin-icon" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+        </svg>
+        <span class="site-address-text">Plot No. 100, Sector 5, Taloja Phase 1, Navi Mumbai</span>
       </div>
 
       <!-- Unified Segmented Action Bar (Payment Plan & WhatsApp) -->
@@ -1157,8 +1196,9 @@
     }
 
     // Google Maps Navigation Action
-    mapCard.addEventListener('click', () => {
-      const mapsUrl = "https://www.google.com/maps/search/?api=1&query=Maden+Nova+1+Sector+5+Taloja+Phase+1+Navi+Mumbai";
+    mapCard.addEventListener('click', (e) => {
+      e.preventDefault();
+      const mapsUrl = "https://maps.app.goo.gl/cnNw4eFNBHvShDu2A";
       window.open(mapsUrl, '_blank', 'noopener,noreferrer');
     });
 
