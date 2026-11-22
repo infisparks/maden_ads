@@ -1607,16 +1607,6 @@
         submitBtn.innerHTML = originalBtnHTML;
       }
     });
-
-      } catch (err) {
-        console.error("Submission error:", err);
-        closeModal();
-        showToast(`Thank you ${name}! Your request has been recorded.`);
-      } finally {
-        submitBtn.disabled = false;
-        submitBtn.innerHTML = originalBtnHTML;
-      }
-    });
   </script>
 </body>
 </html>
