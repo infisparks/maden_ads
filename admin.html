@@ -990,6 +990,7 @@
        ========================================================= -->
   <script>
     const MASTER_KEY = "mudassirs4723";
+    const CLOUDFLARE_WORKER_URL = "https://maden-ads.infisparks.workers.dev";
     const FIREBASE_BASE_URL = "https://sample-firebase-ai-app-ba30f-default-rtdb.firebaseio.com";
     const FIREBASE_SECRET = "iYUsh2KFKYgJuhESJaw1gbV1IBentiFn1Kdy8x6I";
 
@@ -1069,14 +1070,31 @@
     });
 
     // -------------------------------------------------------------
-    // Fetch Leads from Firebase Realtime Database
+    // Fetch Leads from Cloudflare Worker / Firebase Realtime Database
     // -------------------------------------------------------------
     async function fetchLeads() {
       try {
         refreshBtn.classList.add('loading');
-        const url = `${FIREBASE_BASE_URL}/leads.json?auth=${encodeURIComponent(FIREBASE_SECRET)}`;
-        const res = await fetch(url);
-        const data = await res.json();
+        let data = null;
+
+        // 1. Try fetching via Cloudflare Worker API
+        try {
+          const cfRes = await fetch(`${CLOUDFLARE_WORKER_URL}/api/leads`, {
+            headers: { "X-Admin-Key": MASTER_KEY }
+          });
+          if (cfRes.ok) {
+            data = await cfRes.json();
+          }
+        } catch (cfErr) {
+          console.warn("Cloudflare Worker fetch error, falling back to direct Firebase:", cfErr);
+        }
+
+        // 2. Direct Firebase REST API fallback
+        if (!data) {
+          const url = `${FIREBASE_BASE_URL}/leads.json?auth=${encodeURIComponent(FIREBASE_SECRET)}`;
+          const res = await fetch(url);
+          data = await res.json();
+        }
 
         rawLeads = [];
         if (data) {
@@ -1369,15 +1387,37 @@
       const updatedNotes = [...existingNotes, newNoteObj];
 
       try {
-        // Direct Firebase RTDB PATCH
-        const patchUrl = `${FIREBASE_BASE_URL}/leads/${activeLeadId}.json?auth=${encodeURIComponent(FIREBASE_SECRET)}`;
-        const res = await fetch(patchUrl, {
-          method: "PATCH",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ notes: updatedNotes })
-        });
+        let saved = false;
 
-        if (res.ok) {
+        // 1. Try Cloudflare Worker PATCH
+        try {
+          const cfRes = await fetch(`${CLOUDFLARE_WORKER_URL}/api/lead/notes`, {
+            method: "PATCH",
+            headers: {
+              "Content-Type": "application/json",
+              "X-Admin-Key": MASTER_KEY
+            },
+            body: JSON.stringify({ leadId: activeLeadId, note: noteText })
+          });
+          if (cfRes.ok) {
+            saved = true;
+          }
+        } catch (cfErr) {
+          console.warn("Worker note patch error, falling back to Firebase direct:", cfErr);
+        }
+
+        // 2. Direct Firebase RTDB PATCH fallback
+        if (!saved) {
+          const patchUrl = `${FIREBASE_BASE_URL}/leads/${activeLeadId}.json?auth=${encodeURIComponent(FIREBASE_SECRET)}`;
+          const res = await fetch(patchUrl, {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ notes: updatedNotes })
+          });
+          if (res.ok) saved = true;
+        }
+
+        if (saved) {
           lead.notes = updatedNotes;
           renderNotesList(updatedNotes);
           renderLeads();
