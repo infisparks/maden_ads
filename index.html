@@ -1549,6 +1549,9 @@
 
       if (!name || !phone) return;
 
+      // Unique Event ID for Meta Pixel + Conversions API (CAPI) Deduplication
+      const eventId = 'lead_' + Date.now() + '_' + Math.random().toString(36).substring(2, 9);
+
       // Loading state on button
       const originalBtnHTML = submitBtn.innerHTML;
       submitBtn.disabled = true;
@@ -1562,6 +1565,7 @@
         phone: phone,
         siteVisitDate: siteVisitDate,
         project: "Maden Nova 1",
+        eventId: eventId, // Pass to server for Meta Conversions API matching
         location: "Sector 5, Taloja Phase 1, Navi Mumbai",
         source: "Landing Page - Payment Plan & Site Visit",
         timestamp: new Date().toISOString(),
@@ -1580,7 +1584,7 @@
           });
           if (workerRes.ok) {
             saved = true;
-            console.log("Lead stored via Cloudflare Worker!");
+            console.log("Lead stored via Cloudflare Worker with eventId:", eventId);
           }
         } catch (workerErr) {
           console.warn("Worker not reachable, falling back to Firebase RTDB:", workerErr);
@@ -1595,7 +1599,7 @@
           });
           if (fbRes.ok) {
             saved = true;
-            console.log("Lead stored directly in Firebase Realtime Database!");
+            console.log("Lead stored directly in Firebase Realtime Database with eventId:", eventId);
           }
         }
 
@@ -1614,7 +1618,7 @@
         if (mainCtaBar) mainCtaBar.classList.add('has-whatsapp');
         if (shareWhatsAppBtn) shareWhatsAppBtn.href = waUrl;
 
-        // 3. Track Meta Pixel Events (Lead & Schedule)
+        // 3. Track Meta Pixel Events with deduplication eventID
         if (typeof fbq === 'function') {
           fbq('track', 'Lead', {
             content_name: 'Maden Nova 1 - Payment Plan & Site Visit',
@@ -1622,11 +1626,12 @@
             value: 0.00,
             currency: 'INR',
             site_visit_date: siteVisitDate
-          });
+          }, { eventID: eventId });
+
           fbq('track', 'Schedule', {
             content_name: 'Maden Nova 1 Site Visit',
             scheduled_date: siteVisitDate
-          });
+          }, { eventID: eventId });
         }
 
         showToast(`Thank you ${name}! Visit scheduled for ${siteVisitDate}.`);
